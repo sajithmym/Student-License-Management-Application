@@ -1,0 +1,64 @@
+.container {
+    margin: 10% 2%;
+}
+
+h1 {
+    color: #007bff;
+    text-align: center;
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    padding: 10%;
+}
+
+.styled-table thead tr {
+    background-color: #f2f2f2;
+    text-align: left;
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+}
+
+.styled-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.styled-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.styled-table .action-icons i {
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.styled-table .fas.fa-check {
+    color: green;
+}
+
+.styled-table .fas.fa-times {
+    color: red;
+}
+
+.styled-table .fas.fa-edit {
+    color: #007bff;
+}
+
+.styled-table .fas.fa-eye {
+    color: #555;
+}
+
+.styled-table a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.styled-table a:hover {
+    color: #0056b3;
+}

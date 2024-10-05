@@ -1,0 +1,133 @@
+<div class="application">
+    <h2>Apply for a Student Licence</h2>
+    <form [formGroup]="studentLicenseForm" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+            <div class="form-group">
+                <label class="field_label" for="firstName">
+                    <div class="star">*</div>First Name
+                </label>
+                <input id="firstName" formControlName="firstName" type="text" required />
+                <div class="warning"
+                    *ngIf="studentLicenseForm.get('firstName')?.touched && studentLicenseForm.get('firstName')?.invalid">
+                    First Name is required.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="field_label" for="lastName">
+                    <div class="star">*</div>Last Name
+                </label>
+                <input id="lastName" formControlName="lastName" type="text" required />
+                <div class="warning"
+                    *ngIf="studentLicenseForm.get('lastName')?.touched && studentLicenseForm.get('lastName')?.invalid">
+                    Last Name is required.
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="field_label" for="studentEmail">
+                    <div class="star">*</div>Student Email
+                </label>
+                <input id="studentEmail" formControlName="studentEmail" type="email" required />
+                <div class="warning"
+                    *ngIf="studentLicenseForm.get('studentEmail')?.touched && studentLicenseForm.get('studentEmail')?.invalid">
+                    Valid Email is required.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="field_label" for="phone">
+                    <div class="star">*</div>Phone
+                </label>
+                <input id="phone" formControlName="phone" type="tel" required />
+                <div class="warning"
+                    *ngIf="studentLicenseForm.get('phone')?.touched && studentLicenseForm.get('phone')?.invalid">
+                    Phone number is required.
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="field_label" for="address">
+                    <div class="star">*</div>Address
+                </label>
+                <input id="address" formControlName="address" type="text" />
+            </div>
+
+            <div class="form-group">
+                <label class="field_label" for="country">
+                    <div class="star">*</div>Country
+                </label>
+                <select class="dropdown_selection" id="country" formControlName="country" required>
+                    <option value="" disabled>Select Country</option>
+                    <option *ngFor="let country of countries" [value]="country">{{ country }}</option>
+                </select>
+                <div class="warning"
+                    *ngIf="studentLicenseForm.get('country')?.touched && studentLicenseForm.get('country')?.invalid">
+                    Country is required.
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="field_label" for="institute">
+                    <div class="star">*</div>Institute
+                </label>
+                <select id="institute" formControlName="institute" required>
+                    <option value="" disabled>Select Institute</option>
+                    <option *ngFor="let institute of institutes" [value]="institute">{{ institute }}</option>
+                </select>
+                <div class="warning"
+                    *ngIf="studentLicenseForm.get('institute')?.touched && studentLicenseForm.get('institute')?.invalid">
+                    Institute is required.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="field_label" for="intake">
+                    <div class="star">*</div>Intake
+                </label>
+                <input id="intake" formControlName="intake" type="text" required />
+                <div class="warning"
+                    *ngIf="studentLicenseForm.get('intake')?.touched && studentLicenseForm.get('intake')?.invalid">
+                    Intake is required.
+                </div>
+            </div>
+
+
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="field_label" for="courseTitle">
+                    <div class="star">*</div>Course Title
+                </label>
+                <input id="courseTitle" formControlName="courseTitle" type="text" required />
+                <div class="warning"
+                    *ngIf="studentLicenseForm.get('courseTitle')?.touched && studentLicenseForm.get('courseTitle')?.invalid">
+                    Course Title is required.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="field_label" for="studentIdCard">
+                    <div class="star">*</div>Student ID Card (jpg/png/jpeg under 10MB)
+                </label>
+                <div class="file-input-wrapper">
+                    <label for="studentIdCard" class="custom-file-upload">
+                        Choose File
+                    </label>
+                    <input id="studentIdCard" type="file" formControlName="studentIdCard"
+                        (change)="onFileChange($event)" required />
+                    <span class="file-name">No File Chosen</span>
+                </div>
+                <div class="warning" *ngIf="fileTooLarge">File size exceeds 10MB.</div>
+            </div>
+        </div>
+
+        <button type="submit" [disabled]="studentLicenseForm.invalid">Submit</button>
+    </form>
+</div>

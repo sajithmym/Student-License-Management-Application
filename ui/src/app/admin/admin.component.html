@@ -1,0 +1,32 @@
+<div class="container">
+    <h1>Admin Panel</h1>
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Intake</th>
+                <th>Course Title</th>
+                <th>Student ID Card</th>
+                <th>Licence Status</th>
+                <th>Approval Status</th>
+                <th>Licence Expiry Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let course of courses">
+                <td>{{ course.intake }}</td>
+                <td>{{ course.courseTitle }}</td>
+                <td><a href="{{ course.studentIdCardUrl }}"><i class="fas fa-download"></i></a></td>
+                <td>{{ course.licenceStatus }}</td>
+                <td>{{ course.approvalStatus }}</td>
+                <td>{{ course.licenceExpiryDate }}</td>
+                <td class="action-icons">
+                    <i class="fas fa-edit" (click)="editCourse(course)"></i>
+                    <i class="fas fa-check" *ngIf="course.approvalStatus === 'Pending'"></i>
+                    <i class="fas fa-times" *ngIf="course.approvalStatus !== 'Approved'"></i>
+                    <i class="fas fa-eye" *ngIf="course.approvalStatus === 'Approved'"></i>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
