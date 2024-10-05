@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Project.Data;
 using Project.Services;
+using DotNetEnv;
 
 namespace Server
 {
@@ -10,8 +11,17 @@ namespace Server
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Load environment variables from .env file
+            Env.Load();
+
+            // Construct the connection string from environment variables
+            var host = Environment.GetEnvironmentVariable("host");
+            var db = Environment.GetEnvironmentVariable("db");
+            var user = Environment.GetEnvironmentVariable("user");
+            var password = Environment.GetEnvironmentVariable("password");
+            var connectionString = $"Server={host};Database={db};User={user};Password={password};";
+
             // Add services to the container.
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
