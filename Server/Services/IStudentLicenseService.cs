@@ -4,8 +4,8 @@ namespace Project.Services
 {
     public interface IStudentLicenseService
     {
-        Task<bool> StudentExists(string email);
-        Task<StudentLicenseApplication> AddStudentLicenseAsync(StudentLicenseApplication application);
-        Task<List<StudentLicenseApplication>> GetAllApplicationsAsync();
+        Task<bool> StudentExists(string email);  // Checks if a student with the same email exists
+        Task<StudentLicenseApplication> AddStudentLicenseAsync(StudentLicenseApplication application);  // Adds a new license application
+        Task<List<StudentLicenseApplication>> GetAllApplicationsAsync();  // Retrieves all license applications
     }
 }

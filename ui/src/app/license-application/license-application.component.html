@@ -122,7 +122,7 @@
                     </label>
                     <input id="studentIdCard" type="file" formControlName="studentIdCard"
                         (change)="onFileChange($event)" required />
-                    <span class="file-name">No File Chosen</span>
+                    <span class="file-name">{{filename}}</span>
                 </div>
                 <div class="warning" *ngIf="fileTooLarge">File size exceeds 10MB.</div>
             </div>

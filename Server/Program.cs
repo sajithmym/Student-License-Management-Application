@@ -1,4 +1,8 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Project.Data;
 using Project.Services;
 using DotNetEnv;
@@ -9,31 +13,65 @@ namespace Server
     {
         public static void Main(string[] args)
         {
+            // Create a web application builder
             var builder = WebApplication.CreateBuilder(args);
 
             // Load environment variables from .env file
             Env.Load();
 
-            // Construct the connection string from environment variables
+            // Construct the connection string using environment variables
+            string connectionString = BuildConnectionString();
+
+            // Register services with the dependency injection container
+            ConfigureServices(builder.Services, connectionString);
+
+            // Build the application
+            var app = builder.Build();
+
+            // Configure middleware
+            Configure(app);
+
+            // Run the application
+            app.Run();
+        }
+
+        private static string BuildConnectionString()
+        {
             var host = Environment.GetEnvironmentVariable("host");
             var db = Environment.GetEnvironmentVariable("db");
             var user = Environment.GetEnvironmentVariable("user");
             var password = Environment.GetEnvironmentVariable("password");
-            var connectionString = $"Server={host};Database={db};User={user};Password={password};";
+            return $"Server={host};Database={db};User={user};Password={password};";
+        }
 
-            // Add services to the container.
-            builder.Services.AddDbContext<AppDbContext>(options =>
+        private static void ConfigureServices(IServiceCollection services, string connectionString)
+        {
+            // Register DbContext with MySQL configuration
+            services.AddDbContext<AppDbContext>(options =>
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-            builder.Services.AddScoped<IStudentLicenseService, StudentLicenseService>();
+            // Register application services
+            services.AddScoped<IStudentLicenseService, StudentLicenseService>();
 
-            builder.Services.AddControllers();
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            // Add MVC services
+            services.AddControllers();
 
-            var app = builder.Build();
+            // Configure CORS to allow all origins
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder => builder.AllowAnyOrigin()
+                                      .AllowAnyHeader()
+                                      .AllowAnyMethod());
+            });
 
-            // Configure the HTTP request pipeline.
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen();
+        }
+
+        private static void Configure(WebApplication app)
+        {
+            // Configure the HTTP request pipeline
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -41,10 +79,13 @@ namespace Server
             }
 
             app.UseHttpsRedirection();
+            app.UseRouting();
+
+            // Apply CORS policy
+            app.UseCors("AllowAllOrigins");
+
             app.UseAuthorization();
             app.MapControllers();
-
-            app.Run();
         }
     }
 }
