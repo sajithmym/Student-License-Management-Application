@@ -22,7 +22,7 @@ namespace Project.Controllers
         [EnableCors("AllowAllOrigins")]
         public async Task<IActionResult> PostApplication([FromForm] StudentLicenseApplication application, IFormFile file)
         {
-            
+            Console.WriteLine("Here");
             // Check if a file was uploaded
             if (file == null || file.Length == 0)
             {
@@ -32,10 +32,9 @@ namespace Project.Controllers
             // Validate the model state
             if (!ModelState.IsValid)
             {
+                Console.WriteLine(ModelState);
                 return BadRequest(ModelState);
             }
-
-            
 
             try
             {

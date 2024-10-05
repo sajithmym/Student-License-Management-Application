@@ -53,21 +53,25 @@ namespace Server
             // Register application services
             services.AddScoped<IStudentLicenseService, StudentLicenseService>();
 
-            // Add MVC services
-            services.AddControllers();
-
-            // Configure CORS to allow all origins
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowAllOrigins",
-                    builder => builder.AllowAnyOrigin()
-                                      .AllowAnyHeader()
-                                      .AllowAnyMethod());
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                               .AllowAnyMethod()
+                               .AllowAnyHeader();
+                    });
             });
+
+            services.AddControllers();
+            // Add MVC services
+            services.AddControllers();
 
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
         }
+
 
         private static void Configure(WebApplication app)
         {
@@ -78,14 +82,16 @@ namespace Server
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
             app.UseRouting();
 
-            // Apply CORS policy
-            app.UseCors("AllowAllOrigins");
+            // Add CORS middleware before the authorization middleware
+            app.UseCors("AllowAllOrigins"); // <-- Add this line here
 
             app.UseAuthorization();
+
             app.MapControllers();
         }
+
+
     }
 }

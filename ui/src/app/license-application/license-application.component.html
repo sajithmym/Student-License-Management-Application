@@ -1,6 +1,7 @@
 <div class="application">
     <h2>Apply for a Student Licence</h2>
     <form [formGroup]="studentLicenseForm" (ngSubmit)="onSubmit()">
+        <!-- First Row -->
         <div class="form-row">
             <div class="form-group">
                 <label class="field_label" for="firstName">
@@ -25,6 +26,7 @@
             </div>
         </div>
 
+        <!-- Second Row -->
         <div class="form-row">
             <div class="form-group">
                 <label class="field_label" for="studentEmail">
@@ -49,6 +51,7 @@
             </div>
         </div>
 
+        <!-- Third Row -->
         <div class="form-row">
             <div class="form-group">
                 <label class="field_label" for="address">
@@ -72,6 +75,7 @@
             </div>
         </div>
 
+        <!-- Fourth Row -->
         <div class="form-row">
             <div class="form-group">
                 <label class="field_label" for="institute">
@@ -97,9 +101,9 @@
                     Intake is required.
                 </div>
             </div>
-
-
         </div>
+
+        <!-- Fifth Row -->
         <div class="form-row">
             <div class="form-group">
                 <label class="field_label" for="courseTitle">
@@ -120,14 +124,18 @@
                     <label for="studentIdCard" class="custom-file-upload">
                         Choose File
                     </label>
-                    <input id="studentIdCard" type="file" formControlName="studentIdCard"
-                        (change)="onFileChange($event)" required />
+                    <input id="studentIdCard" type="file" (change)="onFileChange($event)" required />
                     <span class="file-name">{{filename}}</span>
                 </div>
                 <div class="warning" *ngIf="fileTooLarge">File size exceeds 10MB.</div>
+                <div class="warning" *ngIf="invalidFileType">Invalid file type. Only JPG, PNG, or JPEG are allowed.
+                </div>
             </div>
         </div>
 
-        <button type="submit" [disabled]="studentLicenseForm.invalid">Submit</button>
+        <!-- Submit Button -->
+        <button type="submit" [disabled]="studentLicenseForm.invalid || fileTooLarge || invalidFileType">
+            Submit
+        </button>
     </form>
 </div>

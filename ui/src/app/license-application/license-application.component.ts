@@ -10,11 +10,12 @@ import { values } from 'constant';
 })
 export class StudentLicenseFormComponent {
   studentLicenseForm: FormGroup;
-  countries = ['Country1', 'Country2', 'Country3']; // Country options
-  institutes = ['Institute1', 'Institute2', 'Institute3']; // Institute options
-  fileTooLarge = false; // Flag for file size validation
-  filename: string | null = "No File Selected"; // Initialize filename variable
-  studentIdCard: File | null = null; // Separate variable for the file
+  countries = ['Country1', 'Country2', 'Country3']; // Static country options
+  institutes = ['Institute1', 'Institute2', 'Institute3']; // Static institute options
+  fileTooLarge = false; // File size validation flag
+  invalidFileType = false; // File type validation flag
+  filename: string | null = "No File Selected"; // Display selected file name
+  studentIdCard: File | null = null; // Store the selected file
 
   constructor(private fb: FormBuilder, private http: HttpClient) {
     this.studentLicenseForm = this.fb.group({
@@ -32,46 +33,55 @@ export class StudentLicenseFormComponent {
 
   onFileChange(event: any) {
     const file = event.target.files[0];
+    const allowedFileTypes = ['image/jpeg', 'image/png', 'image/jpg']; // File type check
+
+    // Validate file size and type
     if (file && file.size > 10 * 1024 * 1024) { // Limit file size to 10MB
-      this.fileTooLarge = true; // Set the flag for file too large
-      this.studentIdCard = null; // Reset file if too large
-      this.filename = "No File Selected"; // Reset filename
+      this.fileTooLarge = true;
+      this.invalidFileType = false;
+      this.studentIdCard = null;
+      this.filename = "No File Selected";
+    } else if (file && !allowedFileTypes.includes(file.type)) { // Check file type
+      this.invalidFileType = true;
+      this.fileTooLarge = false;
+      this.studentIdCard = null;
+      this.filename = "No File Selected";
     } else {
-      this.fileTooLarge = false; // Set the flag to false if file size is valid
-      this.studentIdCard = file; // Save the file reference
-      this.filename = file.name; // Store the name of the selected file
+      this.fileTooLarge = false;
+      this.invalidFileType = false;
+      this.studentIdCard = file;
+      this.filename = file.name;
     }
   }
 
   onSubmit() {
     if (this.studentLicenseForm.valid && this.studentIdCard) {
       const formData = new FormData();
-
-      // Append all form field values to the FormData
+      console.log(this.studentLicenseForm.value);
+      // Append all form fields
       Object.keys(this.studentLicenseForm.value).forEach(key => {
         formData.append(key, this.studentLicenseForm.value[key]);
       });
+      // Append the file to FormData
+      formData.append('file', this.studentIdCard, this.studentIdCard.name);
 
-      // Append the file to the FormData with the key matching the backend expectation
-      formData.append('file', this.studentIdCard, this.studentIdCard.name); // Use the file name
-
-      // Make HTTP request to backend API
+      // Post the data to the backend API
       this.http.post(`${values.backend_address}/api/studentlicense`, formData)
         .subscribe({
           next: (response) => {
-            alert('Form submitted successfully!'); // Alert on successful submission
-            this.studentLicenseForm.reset(); // Reset form fields
-            this.filename = "No File Selected"; // Reset filename after submission
-            this.studentIdCard = null; // Reset file after submission
+            alert('Form submitted successfully!');
+            this.studentLicenseForm.reset();
+            this.filename = "No File Selected";
+            this.studentIdCard = null;
           },
           error: (error) => {
-            console.error('Error uploading file:', error); // Log error
             const errorMessage = error.error ? error.error : 'An unexpected error occurred.';
-            alert('Error uploading file: ' + errorMessage); // Show error message
+            console.log(errorMessage);
+
           }
         });
     } else if (!this.studentIdCard) {
-      alert('Please select a file before submitting.'); // Alert if no file is selected
+      alert('Please select a file before submitting.');
     }
   }
 }
