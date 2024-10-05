@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using Project.Data;
+using Project.Services;
 
 namespace Server
 {
@@ -8,9 +11,13 @@ namespace Server
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+            builder.Services.AddScoped<IStudentLicenseService, StudentLicenseService>();
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -24,10 +31,7 @@ namespace Server
             }
 
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
-
-
             app.MapControllers();
 
             app.Run();
