@@ -57,11 +57,21 @@ export class StudentLicenseFormComponent {
   onSubmit() {
     if (this.studentLicenseForm.valid && this.studentIdCard) {
       const formData = new FormData();
-      console.log(this.studentLicenseForm.value);
-      // Append all form fields
-      Object.keys(this.studentLicenseForm.value).forEach(key => {
-        formData.append(key, this.studentLicenseForm.value[key]);
-      });
+
+      // Create the JSON object with the desired structure
+      const studentData = {
+        id: 8462, // Use a dynamic way to assign ID if necessary
+        name: `${this.studentLicenseForm.value.firstName} ${this.studentLicenseForm.value.lastName}`, // Concatenate first and last names
+        email: this.studentLicenseForm.value.studentEmail,
+        courseTitle: this.studentLicenseForm.value.courseTitle,
+        intake: this.studentLicenseForm.value.intake, // Ensure intake is in the correct format
+        licenceStatus: "", // You can modify this according to your logic
+        approvalStatus: "", // You can modify this according to your logic
+        licenceExpiryDate: "12/12/1999" // Set default value for licenceExpiryDate
+      };
+
+      // Append the JSON data to the FormData object
+      formData.append('application', JSON.stringify(studentData)); // Append the student data
       // Append the file to FormData
       formData.append('file', this.studentIdCard, this.studentIdCard.name);
 
@@ -77,7 +87,6 @@ export class StudentLicenseFormComponent {
           error: (error) => {
             const errorMessage = error.error ? error.error : 'An unexpected error occurred.';
             console.log(errorMessage);
-
           }
         });
     } else if (!this.studentIdCard) {

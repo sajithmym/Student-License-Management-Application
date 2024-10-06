@@ -10,6 +10,6 @@ namespace Project.Models
         public DateTime Intake { get; set; }
         public string LicenceStatus { get; set; } = string.Empty;
         public string ApprovalStatus { get; set; } = string.Empty;
-        public DateTime? LicenceExpiryDate { get; set; }
+        public DateTime LicenceExpiryDate { get; set; }
     }
 }

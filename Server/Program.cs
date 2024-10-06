@@ -13,26 +13,33 @@ namespace Server
     {
         public static void Main(string[] args)
         {
-            // Create a web application builder
-            var builder = WebApplication.CreateBuilder(args);
+            try
+            {
+                // Create a web application builder
+                var builder = WebApplication.CreateBuilder(args);
 
-            // Load environment variables from .env file
-            Env.Load();
+                // Load environment variables from .env file
+                Env.Load();
 
-            // Construct the connection string using environment variables
-            string connectionString = BuildConnectionString();
+                // Construct the connection string using environment variables
+                string connectionString = BuildConnectionString();
 
-            // Register services with the dependency injection container
-            ConfigureServices(builder.Services, connectionString);
+                // Register services with the dependency injection container
+                ConfigureServices(builder.Services, connectionString);
 
-            // Build the application
-            var app = builder.Build();
+                // Build the application
+                var app = builder.Build();
 
-            // Configure middleware
-            Configure(app);
+                // Configure middleware
+                Configure(app);
 
-            // Run the application
-            app.Run();
+                // Run the application
+                app.Run();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
         }
 
         private static string BuildConnectionString()
@@ -53,25 +60,23 @@ namespace Server
             // Register application services
             services.AddScoped<IStudentLicenseService, StudentLicenseService>();
 
+            // Configure CORS policy
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowAllOrigins",
+                options.AddPolicy("AllowSpecificOrigins",
                     builder =>
                     {
-                        builder.AllowAnyOrigin()
+                        builder.WithOrigins("http://localhost:4200") // Specify the Angular app's URL
                                .AllowAnyMethod()
                                .AllowAnyHeader();
                     });
             });
 
-            services.AddControllers();
             // Add MVC services
             services.AddControllers();
-
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
         }
-
 
         private static void Configure(WebApplication app)
         {
@@ -84,14 +89,12 @@ namespace Server
 
             app.UseRouting();
 
-            // Add CORS middleware before the authorization middleware
-            app.UseCors("AllowAllOrigins"); // <-- Add this line here
+            // Enable CORS policy
+            app.UseCors("AllowSpecificOrigins");
 
             app.UseAuthorization();
 
             app.MapControllers();
         }
-
-
     }
 }
