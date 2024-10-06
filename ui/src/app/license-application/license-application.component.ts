@@ -10,12 +10,12 @@ import { values } from 'constant';
 })
 export class StudentLicenseFormComponent {
   studentLicenseForm: FormGroup;
-  countries = ['Country1', 'Country2', 'Country3']; // Static country options
-  institutes = ['Institute1', 'Institute2', 'Institute3']; // Static institute options
-  fileTooLarge = false; // File size validation flag
-  invalidFileType = false; // File type validation flag
-  filename: string | null = "No File Selected"; // Display selected file name
-  studentIdCard: File | null = null; // Store the selected file
+  countries = ['Country1', 'Country2', 'Country3'];
+  institutes = ['Institute1', 'Institute2', 'Institute3'];
+  fileTooLarge = false;
+  invalidFileType = false;
+  filename: string | null = "No File Selected";
+  studentIdCard: File | null = null;
 
   constructor(private fb: FormBuilder, private http: HttpClient) {
     this.studentLicenseForm = this.fb.group({
@@ -33,56 +33,52 @@ export class StudentLicenseFormComponent {
 
   onFileChange(event: any) {
     const file = event.target.files[0];
-    const allowedFileTypes = ['image/jpeg', 'image/png', 'image/jpg']; // File type check
+    const allowedFileTypes = ['image/jpeg', 'image/png', 'image/jpg'];
 
-    // Validate file size and type
-    if (file && file.size > 10 * 1024 * 1024) { // Limit file size to 10MB
-      this.fileTooLarge = true;
-      this.invalidFileType = false;
-      this.studentIdCard = null;
-      this.filename = "No File Selected";
-    } else if (file && !allowedFileTypes.includes(file.type)) { // Check file type
-      this.invalidFileType = true;
-      this.fileTooLarge = false;
-      this.studentIdCard = null;
-      this.filename = "No File Selected";
-    } else {
-      this.fileTooLarge = false;
-      this.invalidFileType = false;
-      this.studentIdCard = file;
-      this.filename = file.name;
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        this.setFileError(true, false, null, "No File Selected");
+      } else if (!allowedFileTypes.includes(file.type)) {
+        this.setFileError(false, true, null, "No File Selected");
+      } else {
+        this.setFileError(false, false, file, file.name);
+      }
     }
+  }
+
+  setFileError(fileTooLarge: boolean, invalidFileType: boolean, studentIdCard: File | null, filename: string | null) {
+    this.fileTooLarge = fileTooLarge;
+    this.invalidFileType = invalidFileType;
+    this.studentIdCard = studentIdCard;
+    this.filename = filename;
   }
 
   onSubmit() {
     if (this.studentLicenseForm.valid && this.studentIdCard) {
       const formData = new FormData();
 
-      // Create the JSON object with the desired structure
       const studentData = {
-        id: 8462, // Use a dynamic way to assign ID if necessary
-        name: `${this.studentLicenseForm.value.firstName} ${this.studentLicenseForm.value.lastName}`, // Concatenate first and last names
+        name: `${this.studentLicenseForm.value.firstName} ${this.studentLicenseForm.value.lastName}`,
         email: this.studentLicenseForm.value.studentEmail,
+        phone: this.studentLicenseForm.value.phone,
+        address: this.studentLicenseForm.value.address,
+        country: this.studentLicenseForm.value.country,
+        institute: this.studentLicenseForm.value.institute,
         courseTitle: this.studentLicenseForm.value.courseTitle,
-        intake: this.studentLicenseForm.value.intake, // Ensure intake is in the correct format
-        licenceStatus: "", // You can modify this according to your logic
-        approvalStatus: "", // You can modify this according to your logic
-        licenceExpiryDate: "12/12/1999" // Set default value for licenceExpiryDate
+        intake: this.studentLicenseForm.value.intake,
+        licenceStatus: false,
+        approvalStatus: false,
+        licenceExpiryDate: new Date("1999-12-12")
       };
 
-      // Append the JSON data to the FormData object
-      formData.append('application', JSON.stringify(studentData)); // Append the student data
-      // Append the file to FormData
+      formData.append('application', JSON.stringify(studentData));
       formData.append('file', this.studentIdCard, this.studentIdCard.name);
 
-      // Post the data to the backend API
       this.http.post(`${values.backend_address}/api/studentlicense`, formData)
         .subscribe({
-          next: (response) => {
+          next: () => {
             alert('Form submitted successfully!');
-            this.studentLicenseForm.reset();
-            this.filename = "No File Selected";
-            this.studentIdCard = null;
+            this.resetForm();
           },
           error: (error) => {
             const errorMessage = error.error ? error.error : 'An unexpected error occurred.';
@@ -92,5 +88,11 @@ export class StudentLicenseFormComponent {
     } else if (!this.studentIdCard) {
       alert('Please select a file before submitting.');
     }
+  }
+
+  resetForm() {
+    this.studentLicenseForm.reset();
+    this.filename = "No File Selected";
+    this.studentIdCard = null;
   }
 }

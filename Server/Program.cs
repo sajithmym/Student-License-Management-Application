@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Project.Data;
 using Project.Services;
 using DotNetEnv;
@@ -13,33 +14,26 @@ namespace Server
     {
         public static void Main(string[] args)
         {
-            try
-            {
-                // Create a web application builder
-                var builder = WebApplication.CreateBuilder(args);
+            // Create a web application builder
+            var builder = WebApplication.CreateBuilder(args);
 
-                // Load environment variables from .env file
-                Env.Load();
+            // Load environment variables from .env file
+            Env.Load();
 
-                // Construct the connection string using environment variables
-                string connectionString = BuildConnectionString();
+            // Construct the connection string using environment variables
+            string connectionString = BuildConnectionString();
 
-                // Register services with the dependency injection container
-                ConfigureServices(builder.Services, connectionString);
+            // Register services with the dependency injection container
+            ConfigureServices(builder.Services, connectionString);
 
-                // Build the application
-                var app = builder.Build();
+            // Build the application
+            var app = builder.Build();
 
-                // Configure middleware
-                Configure(app);
+            // Configure middleware
+            Configure(app);
 
-                // Run the application
-                app.Run();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-            }
+            // Run the application
+            app.Run();
         }
 
         private static string BuildConnectionString()
@@ -60,22 +54,27 @@ namespace Server
             // Register application services
             services.AddScoped<IStudentLicenseService, StudentLicenseService>();
 
-            // Configure CORS policy
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowSpecificOrigins",
-                    builder =>
-                    {
-                        builder.WithOrigins("http://localhost:4200") // Specify the Angular app's URL
-                               .AllowAnyMethod()
-                               .AllowAnyHeader();
-                    });
-            });
-
             // Add MVC services
             services.AddControllers();
+
+            // Configure CORS to allow all origins
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder => builder.AllowAnyOrigin()
+                                      .AllowAnyHeader()
+                                      .AllowAnyMethod());
+            });
+
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
+
+            // Add logging
+            services.AddLogging(config =>
+            {
+                config.AddConsole();
+                config.AddDebug();
+            });
         }
 
         private static void Configure(WebApplication app)
@@ -87,13 +86,13 @@ namespace Server
                 app.UseSwaggerUI();
             }
 
+            app.UseHttpsRedirection();
             app.UseRouting();
 
-            // Enable CORS policy
-            app.UseCors("AllowSpecificOrigins");
+            // Apply CORS policy
+            app.UseCors("AllowAllOrigins");
 
             app.UseAuthorization();
-
             app.MapControllers();
         }
     }

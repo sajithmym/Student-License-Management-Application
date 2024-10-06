@@ -1,7 +1,12 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Project.Models;
 using Project.Services;
+using System;
+using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Project.Controllers
@@ -11,41 +16,62 @@ namespace Project.Controllers
     public class StudentLicenseController : ControllerBase
     {
         private readonly IStudentLicenseService _studentService;
+        private readonly ILogger<StudentLicenseController> _logger;
 
-        public StudentLicenseController(IStudentLicenseService studentService)
+        public StudentLicenseController(IStudentLicenseService studentService, ILogger<StudentLicenseController> logger)
         {
             _studentService = studentService;
+            _logger = logger;
         }
 
-        // POST: api/studentlicense
         [HttpPost]
         [EnableCors("AllowAllOrigins")]
-        public async Task<IActionResult> PostApplication([FromForm] StudentLicenseApplication application, IFormFile file)
+        public async Task<IActionResult> PostApplication([FromForm] string application, [FromForm] IFormFile file)
         {
-            
+            _logger.LogInformation("Received a new application submission.");
+
             if (file == null || file.Length == 0)
             {
+                _logger.LogWarning("No file uploaded.");
                 return BadRequest("No file uploaded.");
             }
 
-            // Validate the model state
+            if (string.IsNullOrEmpty(application))
+            {
+                _logger.LogWarning("No application data provided.");
+                return BadRequest("No application data provided.");
+            }
+
+            StudentLicenseApplication? applicationObj;
+            try
+            {
+                applicationObj = JsonConvert.DeserializeObject<StudentLicenseApplication>(application);
+                if (applicationObj == null)
+                {
+                    throw new Exception("Deserialized application object is null.");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to deserialize application data.");
+                return BadRequest("Invalid application data.");
+            }
+
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("Model state is invalid.");
                 return BadRequest(ModelState);
             }
 
             try
             {
-                // Define the uploads folder path
                 var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
 
-                // Create the uploads folder if it doesn't exist
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
                 }
 
-                // Generate a unique file name and save the file
                 var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                 var filePath = Path.Combine(uploadsFolder, fileName);
 
@@ -54,29 +80,27 @@ namespace Project.Controllers
                     await file.CopyToAsync(stream);
                 }
 
-                // Assign the file path to the application model
-                application.Licencepicture_path = filePath;
+                applicationObj.Licencepicture_path = filePath;
 
-                // Save the application to the database
-                var result = await _studentService.AddStudentLicenseAsync(application);
+                var result = await _studentService.AddStudentLicenseAsync(applicationObj);
 
-                // Return a success response
-                return Ok(result);
+                _logger.LogInformation("Application submitted successfully.");
+
+                return Ok(new { message = "Application submitted successfully.", application = applicationObj });
             }
             catch (Exception ex)
             {
-                // Return a bad request with the exception message
+                _logger.LogError(ex, "An error occurred while processing the application.");
                 return BadRequest($"An error occurred: {ex.Message}");
             }
         }
 
-
-
-        // GET: api/studentlicense
         [HttpGet]
         public async Task<IActionResult> GetApplications()
         {
+            _logger.LogInformation("Fetching all applications.");
             var applications = await _studentService.GetAllApplicationsAsync();
+            _logger.LogInformation("Fetched {Count} applications.", applications.Count);
             return Ok(applications);
         }
     }
