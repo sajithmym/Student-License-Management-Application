@@ -1,15 +1,12 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Project.Models;
 using Project.Services;
-using System;
 using System.IO;
-using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Project.Controllers
+namespace Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -102,6 +99,33 @@ namespace Project.Controllers
             var applications = await _studentService.GetAllApplicationsAsync();
             _logger.LogInformation("Fetched {Count} applications.", applications.Count);
             return Ok(applications);
+        }
+
+        [HttpGet("picture/{id}")]
+        public async Task<IActionResult> GetPicture(int id)
+        {
+            _logger.LogInformation("Fetching picture for application with ID {Id}.", id);
+
+            try
+            {
+                var application = await _studentService.GetStudentLicenseByIdAsync(id);
+                if (application == null || string.IsNullOrEmpty(application.Licencepicture_path))
+                {
+                    _logger.LogWarning("Application with ID {Id} not found or no picture available.", id);
+                    return NotFound();
+                }
+
+                var filePath = application.Licencepicture_path;
+                var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+
+                _logger.LogInformation("Picture for application with ID {Id} fetched successfully.", id);
+                return File(fileBytes, "application/octet-stream");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching the picture.");
+                return BadRequest($"An error occurred: {ex.Message}");
+            }
         }
     }
 }

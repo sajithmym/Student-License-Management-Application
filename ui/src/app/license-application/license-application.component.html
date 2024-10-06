@@ -43,7 +43,7 @@
                 <label class="field_label" for="phone">
                     <div class="star">*</div>Phone
                 </label>
-                <input id="phone" formControlName="phone" type="tel" required />
+                <input id="phone" formControlName="phone" type="tel" maxlength="10" required />
                 <div class="warning"
                     *ngIf="studentLicenseForm.get('phone')?.touched && studentLicenseForm.get('phone')?.invalid">
                     Phone number is required.
@@ -95,7 +95,7 @@
                 <label class="field_label" for="intake">
                     <div class="star">*</div>Intake
                 </label>
-                <input id="intake" formControlName="intake" type="text" required />
+                <input id="intake" formControlName="intake" type="date" required />
                 <div class="warning"
                     *ngIf="studentLicenseForm.get('intake')?.touched && studentLicenseForm.get('intake')?.invalid">
                     Intake is required.

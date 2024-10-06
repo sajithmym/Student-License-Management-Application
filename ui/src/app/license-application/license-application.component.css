@@ -52,6 +52,13 @@ input[type="file"] {
     padding: 10px;
 }
 
+input[type="date"] {
+    width: 91.7%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
 button {
     width: 100%;
     padding: 10px;
@@ -110,5 +117,7 @@ button:disabled {
 .file-name {
     margin-left: 12px;
     font-size: 14px;
-    color: #6c757d;
+    color: black;
+    width: 45%;
+    overflow: hidden;
 }

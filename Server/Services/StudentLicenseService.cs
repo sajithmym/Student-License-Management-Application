@@ -36,5 +36,10 @@ namespace Project.Services
         {
             return await _context.StudentLicenseApplications.ToListAsync();
         }
+
+        public async Task<StudentLicenseApplication?> GetStudentLicenseByIdAsync(int id)
+        {
+            return await _context.StudentLicenseApplications.FindAsync(id);
+        }
     }
 }

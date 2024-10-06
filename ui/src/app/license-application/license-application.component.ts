@@ -83,6 +83,7 @@ export class StudentLicenseFormComponent {
           error: (error) => {
             const errorMessage = error.error ? error.error : 'An unexpected error occurred.';
             console.log(errorMessage);
+            alert(errorMessage)
           }
         });
     } else if (!this.studentIdCard) {
