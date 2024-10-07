@@ -41,18 +41,17 @@ The backend is built using .NET Web API and connects to a MySQL database.
    DB_HOST=your_mysql_host
    DB_USER=your_mysql_user
    DB_PASSWORD=your_mysql_password
+```
 
-
+```
  DB_NAME=license_application
    JWT_SECRET_KEY=your_jwt_secret_key
    JWT_EXPIRY_HOURS=1
    ADMIN_PASSWORD=your_admin_password
-   ```
-
+   ````
+````
 3. Navigate to the `Server` directory:
-   ```bash
-   cd Server
-   ```
+
 
 4. Install necessary backend packages:
    ```bash
