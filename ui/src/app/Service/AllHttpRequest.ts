@@ -43,6 +43,10 @@ export class AuthService {
         return this.http.get(`${this.apiUrl}/picture/${id}`, { responseType: 'blob', observe: 'response', headers });
     }
 
+    submitStudentLicenseForm(formData: FormData): Observable<any> {
+        return this.http.post<any>(this.apiUrl, formData);
+    }
+
     private getAuthHeaders(): HttpHeaders {
         const token = localStorage.getItem('token');
         return new HttpHeaders({

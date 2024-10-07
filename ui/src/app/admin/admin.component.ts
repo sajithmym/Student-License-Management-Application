@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from './service';
+import { AuthService } from '../Service/AllHttpRequest'; // Import the AuthService
 import { HttpResponse } from '@angular/common/http';
 
 @Component({
@@ -19,6 +19,10 @@ export class AdminComponent implements OnInit {
     this.checkAuthentication();
   }
 
+  /**
+   * Checks if the user is authenticated by validating the token.
+   * If valid, loads the applications; otherwise, shows the login popup.
+   */
   checkAuthentication() {
     const token = localStorage.getItem('token');
     if (token) {
@@ -44,6 +48,9 @@ export class AdminComponent implements OnInit {
     }
   }
 
+  /**
+   * Loads the list of applications from the server.
+   */
   loadApplications() {
     this.authService.getApplications().subscribe(
       (data: any[]) => {
@@ -57,10 +64,17 @@ export class AdminComponent implements OnInit {
     );
   }
 
+  /**
+   * Initiates the editing mode for a specific course.
+   * @param course The course to be edited.
+   */
   editCourse(course: any) {
     this.editingCourse = { ...course }; // Clone the course to avoid direct mutation
   }
 
+  /**
+   * Saves the edited course by sending the updated data to the server.
+   */
   saveCourse() {
     if (this.editingCourse) {
       this.authService.editApplication(this.editingCourse.id, this.editingCourse).subscribe(
@@ -75,10 +89,17 @@ export class AdminComponent implements OnInit {
     }
   }
 
+  /**
+   * Cancels the editing mode without saving changes.
+   */
   cancelEdit() {
     this.editingCourse = null; // Exit edit mode without saving
   }
 
+  /**
+   * Deletes a specific course after user confirmation.
+   * @param course The course to be deleted.
+   */
   deleteCourse(course: any) {
     if (confirm('Are you sure you want to delete this course?')) {
       this.authService.deleteApplication(course.id).subscribe(
@@ -92,6 +113,11 @@ export class AdminComponent implements OnInit {
     }
   }
 
+  /**
+   * Fetches and downloads the picture associated with a specific course.
+   * @param event The event triggered by the user action.
+   * @param course The course whose picture is to be viewed.
+   */
   viewPicture(event: Event, course: any) {
     event.preventDefault(); // Prevent the default action of the anchor tag
     this.authService.getPicture(course.id).subscribe(
@@ -119,10 +145,17 @@ export class AdminComponent implements OnInit {
     );
   }
 
+  /**
+   * Closes the login popup.
+   */
   closePopup() {
     this.showPopup = false;
   }
 
+  /**
+   * Submits the password for authentication and retrieves a token if successful.
+   * @param password The password entered by the user.
+   */
   submitPassword(password: string) {
     this.authService.login(password).subscribe(
       (response: any) => {

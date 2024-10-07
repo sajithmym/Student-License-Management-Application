@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { values } from 'constant';
+import { AuthService } from '../Service/AllHttpRequest'; // Import the AuthService
 
 @Component({
   selector: 'app-student-license-form',
@@ -10,14 +9,15 @@ import { values } from 'constant';
 })
 export class StudentLicenseFormComponent {
   studentLicenseForm: FormGroup;
-  countries = ['Country1', 'Country2', 'Country3'];
-  institutes = ['Institute1', 'Institute2', 'Institute3'];
+  countries = ['Srilanka', 'Canada', 'United Kingdom', 'Australia', 'Germany', 'France', 'India', 'China', 'Japan', 'Brazil'];
+  institutes = ['University of Colombo', 'University of Peradeniya', 'University of Sri Jayewardenepura', 'University of Kelaniya', 'University of Moratuwa', 'University of Ruhuna', 'Eastern University, Sri Lanka', 'South Eastern University of Sri Lanka', 'Rajarata University of Sri Lanka', 'Sabaragamuwa University of Sri Lanka'];
   fileTooLarge = false;
   invalidFileType = false;
   filename: string | null = "No File Selected";
   studentIdCard: File | null = null;
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {
+  constructor(private fb: FormBuilder, private authService: AuthService) { // Inject the AuthService
+    // Initialize the form with validation rules
     this.studentLicenseForm = this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
@@ -27,10 +27,15 @@ export class StudentLicenseFormComponent {
       country: ['', Validators.required],
       institute: ['', Validators.required],
       intake: ['', Validators.required],
-      courseTitle: ['', Validators.required],
+      courseTitle: ['', Validators.required]
     });
   }
 
+  /**
+   * Handles file input change event.
+   * Validates the file size and type.
+   * @param event The file input change event.
+   */
   onFileChange(event: any) {
     const file = event.target.files[0];
     const allowedFileTypes = ['image/jpeg', 'image/png', 'image/jpg'];
@@ -46,6 +51,13 @@ export class StudentLicenseFormComponent {
     }
   }
 
+  /**
+   * Sets the file error state.
+   * @param fileTooLarge Indicates if the file is too large.
+   * @param invalidFileType Indicates if the file type is invalid.
+   * @param studentIdCard The selected file.
+   * @param filename The name of the selected file.
+   */
   setFileError(fileTooLarge: boolean, invalidFileType: boolean, studentIdCard: File | null, filename: string | null) {
     this.fileTooLarge = fileTooLarge;
     this.invalidFileType = invalidFileType;
@@ -53,6 +65,10 @@ export class StudentLicenseFormComponent {
     this.filename = filename;
   }
 
+  /**
+   * Handles form submission.
+   * Validates the form and sends the data to the server.
+   */
   onSubmit() {
     if (this.studentLicenseForm.valid && this.studentIdCard) {
       const formData = new FormData();
@@ -66,31 +82,30 @@ export class StudentLicenseFormComponent {
         institute: this.studentLicenseForm.value.institute,
         courseTitle: this.studentLicenseForm.value.courseTitle,
         intake: this.studentLicenseForm.value.intake,
-        licenceStatus: false,
-        approvalStatus: false,
-        licenceExpiryDate: new Date("1999-12-12")
       };
 
       formData.append('application', JSON.stringify(studentData));
       formData.append('file', this.studentIdCard, this.studentIdCard.name);
 
-      this.http.post(`${values.backend_address}/api/studentlicense`, formData)
-        .subscribe({
-          next: () => {
-            alert('Form submitted successfully!');
-            this.resetForm();
-          },
-          error: (error) => {
-            const errorMessage = error.error ? error.error : 'An unexpected error occurred.';
-            console.log(errorMessage);
-            alert(errorMessage)
-          }
-        });
+      this.authService.submitStudentLicenseForm(formData).subscribe({
+        next: () => {
+          alert('Form submitted successfully!');
+          this.resetForm();
+        },
+        error: (error) => {
+          const errorMessage = error.error ? error.error : 'An unexpected error occurred.';
+          console.log(errorMessage);
+          alert(errorMessage);
+        }
+      });
     } else if (!this.studentIdCard) {
       alert('Please select a file before submitting.');
     }
   }
 
+  /**
+   * Resets the form to its initial state.
+   */
   resetForm() {
     this.studentLicenseForm.reset();
     this.filename = "No File Selected";

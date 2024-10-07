@@ -7,66 +7,77 @@
         <span></span>
         <span></span>
     </div>
-    <table class="styled-table" *ngIf="!loading">
-        <caption>
-            <h1>Admin Panel</h1>
-        </caption>
-        <thead>
-            <tr>
-                <th>Intake</th>
-                <th>Course Title</th>
-                <th>Student ID Card</th>
-                <th>Licence Status</th>
-                <th>Approval Status</th>
-                <th>Licence Expiry Date</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let application of Applications">
-                <td *ngIf="editingCourse?.id !== application.id">{{ application.intake | date }}</td>
-                <td *ngIf="editingCourse?.id === application.id"><input type="date"
-                        [(ngModel)]="editingCourse.intake" />
-                </td>
+    <div *ngIf="!loading">
+        <table class="styled-table">
+            <caption>
+                <h1>Admin Panel</h1>
+            </caption>
+            <thead>
+                <tr>
+                    <th>Intake</th>
+                    <th>Course Title</th>
+                    <th>Student ID Card</th>
+                    <th>Licence Status</th>
+                    <th>Approval Status</th>
+                    <th>Licence Expiry Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngIf="Applications.length === 0">
+                    <td colspan="7" style="color:red;font-size: x-large;text-align: center;">Unable to retrieve data.
+                        Please
+                        verify the connection.</td>
+                </tr>
+                <tr *ngFor="let application of Applications">
+                    <td *ngIf="editingCourse?.id !== application.id">{{ application.intake | date }}</td>
+                    <td *ngIf="editingCourse?.id === application.id"><input type="date"
+                            [(ngModel)]="editingCourse.intake" />
+                    </td>
 
-                <td *ngIf="editingCourse?.id !== application.id">{{ application.courseTitle }}</td>
-                <td *ngIf="editingCourse?.id === application.id"><input [(ngModel)]="editingCourse.courseTitle" /></td>
+                    <td *ngIf="editingCourse?.id !== application.id">{{ application.courseTitle }}</td>
+                    <td *ngIf="editingCourse?.id === application.id"><input [(ngModel)]="editingCourse.courseTitle" />
+                    </td>
 
-                <td><a href="#" (click)="viewPicture($event, application)"><i class="fas fa-download"></i></a></td>
+                    <td style="text-align: center;"><a href="#" (click)="viewPicture($event, application)"><i
+                                class="fas fa-download"></i></a></td>
 
-                <td *ngIf="editingCourse?.id !== application.id">{{ application.licenceStatus ? 'True' : 'False' }}</td>
-                <td *ngIf="editingCourse?.id === application.id">
-                    <select [(ngModel)]="editingCourse.licenceStatus">
-                        <option [ngValue]="true">True</option>
-                        <option [ngValue]="false">False</option>
-                    </select>
-                </td>
+                    <td *ngIf="editingCourse?.id !== application.id">{{ application.licenceStatus ? 'True' : 'False' }}
+                    </td>
+                    <td *ngIf="editingCourse?.id === application.id">
+                        <select [(ngModel)]="editingCourse.licenceStatus">
+                            <option [ngValue]="true">True</option>
+                            <option [ngValue]="false">False</option>
+                        </select>
+                    </td>
 
-                <td *ngIf="editingCourse?.id !== application.id">{{ application.approvalStatus ? 'True' : 'False' }}
-                </td>
-                <td *ngIf="editingCourse?.id === application.id">
-                    <select [(ngModel)]="editingCourse.approvalStatus">
-                        <option [ngValue]="true">True</option>
-                        <option [ngValue]="false">False</option>
-                    </select>
-                </td>
+                    <td *ngIf="editingCourse?.id !== application.id">{{ application.approvalStatus ? 'True' : 'False' }}
+                    </td>
+                    <td *ngIf="editingCourse?.id === application.id">
+                        <select [(ngModel)]="editingCourse.approvalStatus">
+                            <option [ngValue]="true">True</option>
+                            <option [ngValue]="false">False</option>
+                        </select>
+                    </td>
 
-                <td *ngIf="editingCourse?.id !== application.id">{{ application.licenceExpiryDate | date }}</td>
-                <td *ngIf="editingCourse?.id === application.id"><input type="date"
-                        [(ngModel)]="editingCourse.licenceExpiryDate" /></td>
+                    <td *ngIf="editingCourse?.id !== application.id">{{ application.licenceExpiryDate | date }}</td>
+                    <td *ngIf="editingCourse?.id === application.id"><input type="date"
+                            [(ngModel)]="editingCourse.licenceExpiryDate" /></td>
 
-                <td class="action-icons">
-                    <i class="fas fa-edit" *ngIf="editingCourse?.id !== application.id"
-                        (click)="editCourse(application)"></i>
-                    <i class="fas fa-save" *ngIf="editingCourse?.id === application.id" (click)="saveCourse()"></i>
-                    <i class="fas fa-times" *ngIf="editingCourse?.id === application.id" (click)="cancelEdit()"></i>
-                    <i class="fas fa-trash" (click)="deleteCourse(application)"></i>
-                    <i class="fas fa-eye" *ngIf="application.approvalStatus === 'Approved'"></i>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <app-nav-buttons></app-nav-buttons>
+                    <td class="action-icons">
+                        <i class="fas fa-edit" *ngIf="editingCourse?.id !== application.id"
+                            (click)="editCourse(application)"></i>
+                        <i class="fas fa-save" *ngIf="editingCourse?.id === application.id" (click)="saveCourse()"></i>
+                        <i class="fas fa-times" *ngIf="editingCourse?.id === application.id" (click)="cancelEdit()"></i>
+                        <i class="fas fa-trash" (click)="deleteCourse(application)"></i>
+                        <i class="fas fa-eye" *ngIf="application.approvalStatus === 'Approved'"></i>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <app-nav-buttons></app-nav-buttons>
+    </div>
+
 </div>
 
 <app-ask-password [show]="showPopup" (close)="closePopup()" (submit)="submitPassword($event)"></app-ask-password>

@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Project.Models;
 using Project.Services;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Server.Controllers
 {
@@ -20,6 +23,12 @@ namespace Server.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Handles the submission of a new student license application.
+        /// </summary>
+        /// <param name="application">The application data as a JSON string.</param>
+        /// <param name="file">The uploaded file.</param>
+        /// <returns>An IActionResult indicating the result of the operation.</returns>
         [HttpPost]
         [EnableCors("AllowAllOrigins")]
         public async Task<IActionResult> PostApplication([FromForm] string application, [FromForm] IFormFile file)
@@ -91,6 +100,10 @@ namespace Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves all student license applications.
+        /// </summary>
+        /// <returns>A list of student license applications.</returns>
         [HttpGet]
         [Authorize]
         public async Task<ActionResult<IEnumerable<StudentLicenseApplication>>> GetApplications()
@@ -100,6 +113,11 @@ namespace Server.Controllers
             return Ok(applications);
         }
 
+        /// <summary>
+        /// Retrieves the picture associated with a specific application.
+        /// </summary>
+        /// <param name="id">The ID of the application.</param>
+        /// <returns>The picture file.</returns>
         [HttpGet("picture/{id}")]
         [Authorize]
         public async Task<IActionResult> GetPicture(int id)
@@ -134,6 +152,12 @@ namespace Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates an existing student license application.
+        /// </summary>
+        /// <param name="id">The ID of the application to update.</param>
+        /// <param name="application">The updated application data.</param>
+        /// <returns>An IActionResult indicating the result of the operation.</returns>
         [HttpPut("{id}")]
         [Authorize]
         public async Task<IActionResult> EditApplication(int id, [FromBody] StudentLicenseApplication application)
@@ -170,6 +194,11 @@ namespace Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes a specific student license application.
+        /// </summary>
+        /// <param name="id">The ID of the application to delete.</param>
+        /// <returns>An IActionResult indicating the result of the operation.</returns>
         [HttpDelete("{id}")]
         [Authorize]
         public async Task<IActionResult> DeleteApplication(int id)
