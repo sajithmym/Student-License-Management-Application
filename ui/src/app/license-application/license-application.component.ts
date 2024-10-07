@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../Service/AllHttpRequest'; // Import the AuthService
+import { AuthService } from '../Service/AllHttpRequests'; // Import the AuthService
 
 @Component({
   selector: 'app-student-license-form',
