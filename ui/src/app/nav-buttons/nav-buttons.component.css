@@ -4,6 +4,8 @@
     align-items: center;
     gap: 20px;
     margin-top: 5%;
+    flex-wrap: wrap;
+    /* Allow buttons to wrap on smaller screens */
 }
 
 .nav-button {
@@ -29,4 +31,23 @@
 .nav-button:active {
     background-color: #004494;
     transform: scale(1);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .nav-button {
+        width: 45%;
+        /* Adjust width for tablets */
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-button {
+        width: 80%;
+        /* Adjust width for mobile devices */
+        font-size: 14px;
+        /* Adjust font size for mobile devices */
+        padding: 8px 16px;
+        /* Adjust padding for mobile devices */
+    }
 }
