@@ -8,9 +8,10 @@ import { HttpResponse } from '@angular/common/http';
   styleUrls: ['./admin.component.css']
 })
 export class AdminComponent implements OnInit {
-  courses: any[] = [];
+  Applications: any[] = [];
   showPopup: boolean = false;
   editingCourse: any = null; // Track the course being edited
+  loading: boolean = true; // Track loading state
 
   constructor(private authService: AuthService) { }
 
@@ -28,25 +29,30 @@ export class AdminComponent implements OnInit {
             this.loadApplications();
           } else {
             this.showPopup = true;
+            this.loading = false; // Stop loading if authentication fails
           }
         },
         (error: any) => {
           console.error('Error validating token', error);
           this.showPopup = true;
+          this.loading = false; // Stop loading if authentication fails
         }
       );
     } else {
       this.showPopup = true;
+      this.loading = false; // Stop loading if no token is found
     }
   }
 
   loadApplications() {
     this.authService.getApplications().subscribe(
       (data: any[]) => {
-        this.courses = data;
+        this.Applications = data;
+        this.loading = false; // Stop loading when data is fetched
       },
       (error: any) => {
         console.error('Error fetching applications', error);
+        this.loading = false; // Stop loading if there's an error
       }
     );
   }

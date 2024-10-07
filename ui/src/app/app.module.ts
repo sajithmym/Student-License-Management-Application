@@ -9,6 +9,7 @@ import { AdminComponent } from './admin/admin.component';
 import { StudentLicenseFormComponent } from './license-application/license-application.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { AskPasswordComponent } from './ask-password/ask-password.component';
+import { NavButtonsComponent } from './nav-buttons/nav-buttons.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { AskPasswordComponent } from './ask-password/ask-password.component';
     AdminComponent,
     StudentLicenseFormComponent,
     NotFoundComponent,
-    AskPasswordComponent
+    AskPasswordComponent,
+    NavButtonsComponent
   ],
   imports: [
     BrowserModule,

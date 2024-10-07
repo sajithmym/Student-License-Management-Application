@@ -5,7 +5,7 @@ import { AdminComponent } from './admin/admin.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/admin', pathMatch: 'full' },
+  { path: '', redirectTo: '/student-license-form', pathMatch: 'full' },
   { path: 'student-license-form', component: StudentLicenseFormComponent },
   { path: 'admin', component: AdminComponent },
   { path: '**', component: NotFoundComponent }
