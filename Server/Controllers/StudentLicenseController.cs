@@ -1,10 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Project.Models;
 using Project.Services;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace Server.Controllers
 {
@@ -93,6 +92,7 @@ namespace Server.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<StudentLicenseApplication>>> GetApplications()
         {
             _logger.LogInformation("Fetching all applications.");
@@ -101,6 +101,7 @@ namespace Server.Controllers
         }
 
         [HttpGet("picture/{id}")]
+        [Authorize]
         public async Task<IActionResult> GetPicture(int id)
         {
             _logger.LogInformation("Fetching picture for application with ID {Id}.", id);
@@ -134,6 +135,7 @@ namespace Server.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> EditApplication(int id, [FromBody] StudentLicenseApplication application)
         {
             _logger.LogInformation("Editing application with ID {Id}.", id);
@@ -169,6 +171,7 @@ namespace Server.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteApplication(int id)
         {
             _logger.LogInformation("Deleting application with ID {Id}.", id);

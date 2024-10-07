@@ -1,12 +1,15 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Project.Data;
 using Project.Services;
 using DotNetEnv;
+using System.Text;
 
 namespace Server
 {
@@ -66,6 +69,27 @@ namespace Server
                                       .AllowAnyMethod());
             });
 
+            // Configure JWT authentication
+            var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY") ?? "default";
+            var key = Encoding.ASCII.GetBytes(secretKey);
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
@@ -92,7 +116,10 @@ namespace Server
             // Apply CORS policy
             app.UseCors("AllowAllOrigins");
 
+            // Use authentication and authorization middleware
+            app.UseAuthentication();
             app.UseAuthorization();
+
             app.MapControllers();
         }
     }

@@ -9,13 +9,35 @@ import { HttpResponse } from '@angular/common/http';
 })
 export class AdminComponent implements OnInit {
   courses: any[] = [];
-  showPopup: boolean = true;
+  showPopup: boolean = false;
   editingCourse: any = null; // Track the course being edited
 
   constructor(private authService: AuthService) { }
 
   ngOnInit() {
-    this.loadApplications();
+    this.checkAuthentication();
+  }
+
+  checkAuthentication() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      this.authService.validateToken(token).subscribe(
+        (response: any) => {
+          if (response.valid) {
+            this.showPopup = false;
+            this.loadApplications();
+          } else {
+            this.showPopup = true;
+          }
+        },
+        (error: any) => {
+          console.error('Error validating token', error);
+          this.showPopup = true;
+        }
+      );
+    } else {
+      this.showPopup = true;
+    }
   }
 
   loadApplications() {
@@ -96,9 +118,11 @@ export class AdminComponent implements OnInit {
   }
 
   submitPassword(password: string) {
-    this.authService.authenticate(password).subscribe(
+    this.authService.login(password).subscribe(
       (response: any) => {
-        if (response.success) {
+        if (response.token) {
+          localStorage.setItem('token', response.token);
+          this.loadApplications();
           this.showPopup = false;
         } else {
           alert('Incorrect password');
