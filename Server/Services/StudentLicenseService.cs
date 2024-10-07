@@ -41,5 +41,37 @@ namespace Project.Services
         {
             return await _context.StudentLicenseApplications.FindAsync(id);
         }
+
+        public async Task<bool> UpdateStudentLicenseAsync(StudentLicenseApplication application)
+        {
+            var existingApplication = await _context.StudentLicenseApplications.FindAsync(application.Id);
+            if (existingApplication == null)
+            {
+                return false;
+            }
+
+            existingApplication.CourseTitle = application.CourseTitle;
+            existingApplication.LicenceStatus = application.LicenceStatus;
+            existingApplication.ApprovalStatus = application.ApprovalStatus;
+            existingApplication.LicenceExpiryDate = application.LicenceExpiryDate;
+            // Update other fields as necessary
+
+            _context.StudentLicenseApplications.Update(existingApplication);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteStudentLicenseAsync(int id)
+        {
+            var application = await _context.StudentLicenseApplications.FindAsync(id);
+            if (application == null)
+            {
+                return false;
+            }
+
+            _context.StudentLicenseApplications.Remove(application);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

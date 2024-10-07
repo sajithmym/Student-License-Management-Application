@@ -92,15 +92,6 @@ namespace Server.Controllers
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetApplications()
-        {
-            _logger.LogInformation("Fetching all applications.");
-            var applications = await _studentService.GetAllApplicationsAsync();
-            _logger.LogInformation("Fetched {Count} applications.", applications.Count);
-            return Ok(applications);
-        }
-
         [HttpGet("picture/{id}")]
         public async Task<IActionResult> GetPicture(int id)
         {
@@ -117,13 +108,76 @@ namespace Server.Controllers
 
                 var filePath = application.Licencepicture_path;
                 var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+                var fileName = Path.GetFileName(filePath);
 
                 _logger.LogInformation("Picture for application with ID {Id} fetched successfully.", id);
+                Response.Headers.Append("Content-Disposition", $"attachment; filename=\"{fileName}\"");
                 return File(fileBytes, "application/octet-stream");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while fetching the picture.");
+                return BadRequest($"An error occurred: {ex.Message}");
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> EditApplication(int id, [FromBody] StudentLicenseApplication application)
+        {
+            _logger.LogInformation("Editing application with ID {Id}.", id);
+
+            if (id != application.Id)
+            {
+                return BadRequest("ID mismatch");
+            }
+            if (!ModelState.IsValid || application == null)
+            {
+                return BadRequest("Invalid application data.");
+            }
+
+            try
+            {
+                var result = await _studentService.UpdateStudentLicenseAsync(application);
+                if (result)
+                {
+                    _logger.LogInformation("Application with ID {Id} updated successfully.", id);
+                    return Ok();
+                }
+                else
+                {
+                    _logger.LogWarning("Application with ID {Id} not found.", id);
+                    return NotFound();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while updating the application.");
+                return BadRequest($"An error occurred: {ex.Message}");
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteApplication(int id)
+        {
+            _logger.LogInformation("Deleting application with ID {Id}.", id);
+
+            try
+            {
+                var result = await _studentService.DeleteStudentLicenseAsync(id);
+                if (result)
+                {
+                    _logger.LogInformation("Application with ID {Id} deleted successfully.", id);
+                    return Ok();
+                }
+                else
+                {
+                    _logger.LogWarning("Application with ID {Id} not found.", id);
+                    return NotFound();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while deleting the application.");
                 return BadRequest($"An error occurred: {ex.Message}");
             }
         }
