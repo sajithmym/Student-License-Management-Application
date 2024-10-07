@@ -14,14 +14,39 @@
         </thead>
         <tbody>
             <tr *ngFor="let course of courses">
-                <td>{{ course.intake }}</td>
-                <td>{{ course.courseTitle }}</td>
+                <td *ngIf="editingCourse?.id !== course.id">{{ course.intake | date }}</td>
+                <td *ngIf="editingCourse?.id === course.id"><input type="date" [(ngModel)]="editingCourse.intake" />
+                </td>
+
+                <td *ngIf="editingCourse?.id !== course.id">{{ course.courseTitle }}</td>
+                <td *ngIf="editingCourse?.id === course.id"><input [(ngModel)]="editingCourse.courseTitle" /></td>
+
                 <td><a href="#" (click)="viewPicture($event, course)"><i class="fas fa-download"></i></a></td>
-                <td>{{ course.licenceStatus }}</td>
-                <td>{{ course.approvalStatus }}</td>
-                <td>{{ course.licenceExpiryDate }}</td>
+
+                <td *ngIf="editingCourse?.id !== course.id">{{ course.licenceStatus ? 'True' : 'False' }}</td>
+                <td *ngIf="editingCourse?.id === course.id">
+                    <select [(ngModel)]="editingCourse.licenceStatus">
+                        <option [ngValue]="true">True</option>
+                        <option [ngValue]="false">False</option>
+                    </select>
+                </td>
+
+                <td *ngIf="editingCourse?.id !== course.id">{{ course.approvalStatus ? 'True' : 'False' }}</td>
+                <td *ngIf="editingCourse?.id === course.id">
+                    <select [(ngModel)]="editingCourse.approvalStatus">
+                        <option [ngValue]="true">True</option>
+                        <option [ngValue]="false">False</option>
+                    </select>
+                </td>
+
+                <td *ngIf="editingCourse?.id !== course.id">{{ course.licenceExpiryDate | date }}</td>
+                <td *ngIf="editingCourse?.id === course.id"><input type="date"
+                        [(ngModel)]="editingCourse.licenceExpiryDate" /></td>
+
                 <td class="action-icons">
-                    <i class="fas fa-edit" (click)="editCourse(course)"></i>
+                    <i class="fas fa-edit" *ngIf="editingCourse?.id !== course.id" (click)="editCourse(course)"></i>
+                    <i class="fas fa-save" *ngIf="editingCourse?.id === course.id" (click)="saveCourse()"></i>
+                    <i class="fas fa-times" *ngIf="editingCourse?.id === course.id" (click)="cancelEdit()"></i>
                     <i class="fas fa-trash" (click)="deleteCourse(course)"></i>
                     <i class="fas fa-eye" *ngIf="course.approvalStatus === 'Approved'"></i>
                 </td>

@@ -92,6 +92,14 @@ namespace Server.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<StudentLicenseApplication>>> GetApplications()
+        {
+            _logger.LogInformation("Fetching all applications.");
+            var applications = await _studentService.GetAllApplicationsAsync();
+            return Ok(applications);
+        }
+
         [HttpGet("picture/{id}")]
         public async Task<IActionResult> GetPicture(int id)
         {
@@ -108,10 +116,14 @@ namespace Server.Controllers
 
                 var filePath = application.Licencepicture_path;
                 var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
-                var fileName = Path.GetFileName(filePath);
+                var fileName = Path.GetFileNameWithoutExtension(filePath);
+                var fileExtension = Path.GetExtension(filePath);
 
                 _logger.LogInformation("Picture for application with ID {Id} fetched successfully.", id);
-                Response.Headers.Append("Content-Disposition", $"attachment; filename=\"{fileName}\"");
+
+                var fullFileName = $"{fileName}{fileExtension}";
+
+                Response.Headers.Append("Content-Disposition", $"attachment; filename=\"{fullFileName}\"");
                 return File(fileBytes, "application/octet-stream");
             }
             catch (Exception ex)

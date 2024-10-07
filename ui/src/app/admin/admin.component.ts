@@ -10,6 +10,7 @@ import { HttpResponse } from '@angular/common/http';
 export class AdminComponent implements OnInit {
   courses: any[] = [];
   showPopup: boolean = true;
+  editingCourse: any = null; // Track the course being edited
 
   constructor(private authService: AuthService) { }
 
@@ -29,7 +30,25 @@ export class AdminComponent implements OnInit {
   }
 
   editCourse(course: any) {
-    console.log('Edit course', course);
+    this.editingCourse = { ...course }; // Clone the course to avoid direct mutation
+  }
+
+  saveCourse() {
+    if (this.editingCourse) {
+      this.authService.editApplication(this.editingCourse.id, this.editingCourse).subscribe(
+        () => {
+          this.loadApplications();
+          this.editingCourse = null; // Exit edit mode
+        },
+        (error: any) => {
+          console.error('Error saving course', error);
+        }
+      );
+    }
+  }
+
+  cancelEdit() {
+    this.editingCourse = null; // Exit edit mode without saving
   }
 
   deleteCourse(course: any) {
@@ -50,12 +69,12 @@ export class AdminComponent implements OnInit {
     this.authService.getPicture(course.id).subscribe(
       (response: HttpResponse<Blob>) => {
         if (response && response.body && response.headers) {
+          const fileExtension = response.headers.get('File-Extension') || '.png';
           const contentType = response.headers.get('Content-Type') || 'application/octet-stream';
           const blob = new Blob([response.body], { type: contentType });
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement('a');
-          const contentDisposition = response.headers.get('Content-Disposition');
-          const fileName = contentDisposition ? contentDisposition.split('filename=')[1].replace(/"/g, '') : 'download.jpg';
+          const fileName = course.name + fileExtension;
           a.href = url;
           a.download = fileName; // Extract file name from headers
           document.body.appendChild(a); // Append the anchor to the body
