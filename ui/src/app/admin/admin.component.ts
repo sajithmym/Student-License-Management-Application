@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../Service/AllHttpRequests'; // Import the AuthService
+import { AuthService } from '../Service/AllHttpRequests';
 import { HttpResponse } from '@angular/common/http';
+import { values } from 'constant';
 
 @Component({
   selector: 'app-admin',
@@ -10,8 +11,9 @@ import { HttpResponse } from '@angular/common/http';
 export class AdminComponent implements OnInit {
   Applications: any[] = [];
   showPopup: boolean = false;
-  editingCourse: any = null; // Track the course being edited
-  loading: boolean = true; // Track loading state
+  loading: boolean = true;
+  countries = values.countries;
+  institutes = values.institutes;
 
   constructor(private authService: AuthService) { }
 
@@ -19,10 +21,6 @@ export class AdminComponent implements OnInit {
     this.checkAuthentication();
   }
 
-  /**
-   * Checks if the user is authenticated by validating the token.
-   * If valid, loads the applications; otherwise, shows the login popup.
-   */
   checkAuthentication() {
     const token = localStorage.getItem('token');
     if (token) {
@@ -33,76 +31,58 @@ export class AdminComponent implements OnInit {
             this.loadApplications();
           } else {
             this.showPopup = true;
-            this.loading = false; // Stop loading if authentication fails
+            this.loading = false;
           }
         },
         (error: any) => {
           console.error('Error validating token', error);
           this.showPopup = true;
-          this.loading = false; // Stop loading if authentication fails
+          this.loading = false;
         }
       );
     } else {
       this.showPopup = true;
-      this.loading = false; // Stop loading if no token is found
+      this.loading = false;
     }
   }
 
-  /**
-   * Loads the list of applications from the server.
-   */
   loadApplications() {
     this.authService.getApplications().subscribe(
       (data: any[]) => {
-        this.Applications = data;
-        this.loading = false; // Stop loading when data is fetched
+        this.Applications = data.map(application => ({ ...application, editing: false }));
+        this.loading = false;
       },
       (error: any) => {
         console.error('Error fetching applications', error);
-        this.loading = false; // Stop loading if there's an error
+        this.loading = false;
       }
     );
   }
 
-  /**
-   * Initiates the editing mode for a specific course.
-   * @param course The course to be edited.
-   */
-  editCourse(course: any) {
-    this.editingCourse = { ...course }; // Clone the course to avoid direct mutation
+  editCourse(application: any) {
+    application.editing = true;
   }
 
-  /**
-   * Saves the edited course by sending the updated data to the server.
-   */
-  saveCourse() {
-    if (this.editingCourse) {
-      this.authService.editApplication(this.editingCourse.id, this.editingCourse).subscribe(
-        () => {
-          this.loadApplications();
-          this.editingCourse = null; // Exit edit mode
-        },
-        (error: any) => {
-          console.error('Error saving course', error);
-        }
-      );
-    }
+  saveCourse(application: any) {
+    application.editing = false;
+    this.authService.editApplication(application.id, application).subscribe(
+      () => {
+        alert('Course Updated successfully');
+      },
+      (error: any) => {
+        console.error('Error saving course', error);
+      }
+    );
   }
 
-  /**
-   * Cancels the editing mode without saving changes.
-   */
-  cancelEdit() {
-    this.editingCourse = null; // Exit edit mode without saving
+  cancelEdit(application: any) {
+    application.editing = false;
+    this.loadApplications();
   }
 
-  /**
-   * Deletes a specific course after user confirmation.
-   * @param course The course to be deleted.
-   */
-  deleteCourse(course: any) {
+  deleteCourse(application: any) {
     if (confirm('Are you sure you want to delete this course?')) {
-      this.authService.deleteApplication(course.id).subscribe(
+      this.authService.deleteApplication(application.id).subscribe(
         () => {
           this.loadApplications();
         },
@@ -113,14 +93,9 @@ export class AdminComponent implements OnInit {
     }
   }
 
-  /**
-   * Fetches and downloads the picture associated with a specific course.
-   * @param event The event triggered by the user action.
-   * @param course The course whose picture is to be viewed.
-   */
-  viewPicture(event: Event, course: any) {
-    event.preventDefault(); // Prevent the default action of the anchor tag
-    this.authService.getPicture(course.id).subscribe(
+  viewPicture(event: Event, application: any) {
+    event.preventDefault();
+    this.authService.getPicture(application.id).subscribe(
       (response: HttpResponse<Blob>) => {
         if (response && response.body && response.headers) {
           const fileExtension = response.headers.get('File-Extension') || '.png';
@@ -128,13 +103,13 @@ export class AdminComponent implements OnInit {
           const blob = new Blob([response.body], { type: contentType });
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement('a');
-          const fileName = course.name + fileExtension;
+          const fileName = application.name + fileExtension;
           a.href = url;
-          a.download = fileName; // Extract file name from headers
-          document.body.appendChild(a); // Append the anchor to the body
-          a.click(); // Trigger the download
-          document.body.removeChild(a); // Remove the anchor from the body
-          window.URL.revokeObjectURL(url); // Clean up the URL object
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
         } else {
           console.error('Invalid response structure', response);
         }
@@ -145,17 +120,10 @@ export class AdminComponent implements OnInit {
     );
   }
 
-  /**
-   * Closes the login popup.
-   */
   closePopup() {
     this.showPopup = false;
   }
 
-  /**
-   * Submits the password for authentication and retrieves a token if successful.
-   * @param password The password entered by the user.
-   */
   submitPassword(password: string) {
     this.authService.login(password).subscribe(
       (response: any) => {

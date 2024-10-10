@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Project.Data;
 using Project.Models;
+using System;
 
 namespace Project.Services
 {
@@ -27,7 +28,15 @@ namespace Project.Services
         /// <returns>A task that represents the asynchronous operation. The task result contains a boolean indicating whether the student exists.</returns>
         public async Task<bool> StudentExists(string email)
         {
-            return await _context.StudentLicenseApplications.AnyAsync(s => s.Email == email);
+            try
+            {
+                return await _context.StudentLicenseApplications.AnyAsync(s => s.Email == email);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (logging mechanism not shown here)
+                throw new Exception("An error occurred while checking if the student exists.", ex);
+            }
         }
 
         /// <summary>
@@ -38,14 +47,22 @@ namespace Project.Services
         /// <exception cref="System.Exception">Thrown when a student with the same email already exists.</exception>
         public async Task<StudentLicenseApplication> AddStudentLicenseAsync(StudentLicenseApplication application)
         {
-            if (await StudentExists(application.Email))
+            try
             {
-                throw new System.Exception("A student with the same email already exists.");
-            }
+                if (await StudentExists(application.Email))
+                {
+                    throw new Exception("A student with the same email already exists.");
+                }
 
-            _context.StudentLicenseApplications.Add(application);
-            await _context.SaveChangesAsync();
-            return application;
+                _context.StudentLicenseApplications.Add(application);
+                await _context.SaveChangesAsync();
+                return application;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (logging mechanism not shown here)
+                throw new Exception("An error occurred while adding the student license application.", ex);
+            }
         }
 
         /// <summary>
@@ -54,7 +71,15 @@ namespace Project.Services
         /// <returns>A task that represents the asynchronous operation. The task result contains a list of applications.</returns>
         public async Task<List<StudentLicenseApplication>> GetAllApplicationsAsync()
         {
-            return await _context.StudentLicenseApplications.ToListAsync();
+            try
+            {
+                return await _context.StudentLicenseApplications.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (logging mechanism not shown here)
+                throw new Exception("An error occurred while retrieving all applications.", ex);
+            }
         }
 
         /// <summary>
@@ -64,7 +89,15 @@ namespace Project.Services
         /// <returns>A task that represents the asynchronous operation. The task result contains the application, or null if not found.</returns>
         public async Task<StudentLicenseApplication?> GetStudentLicenseByIdAsync(int id)
         {
-            return await _context.StudentLicenseApplications.FindAsync(id);
+            try
+            {
+                return await _context.StudentLicenseApplications.FindAsync(id);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (logging mechanism not shown here)
+                throw new Exception("An error occurred while retrieving the student license application by ID.", ex);
+            }
         }
 
         /// <summary>
@@ -74,22 +107,28 @@ namespace Project.Services
         /// <returns>A task that represents the asynchronous operation. The task result contains a boolean indicating whether the update was successful.</returns>
         public async Task<bool> UpdateStudentLicenseAsync(StudentLicenseApplication application)
         {
-            var existingApplication = await _context.StudentLicenseApplications.FindAsync(application.Id);
-            if (existingApplication == null)
+            try
             {
-                return false;
+                var existingApplication = await _context.StudentLicenseApplications.FindAsync(application.Id);
+                if (existingApplication == null)
+                {
+                    return false;
+                }
+
+                // Detach the existing tracked entity
+                _context.Entry(existingApplication).State = EntityState.Detached;
+
+                // Update the fields of the existing application
+                _context.Entry(application).State = EntityState.Modified;
+
+                await _context.SaveChangesAsync();
+                return true;
             }
-
-            // Update the fields of the existing application
-            existingApplication.CourseTitle = application.CourseTitle;
-            existingApplication.LicenceStatus = application.LicenceStatus;
-            existingApplication.ApprovalStatus = application.ApprovalStatus;
-            existingApplication.LicenceExpiryDate = application.LicenceExpiryDate;
-            // Update other fields as necessary
-
-            _context.StudentLicenseApplications.Update(existingApplication);
-            await _context.SaveChangesAsync();
-            return true;
+            catch (Exception ex)
+            {
+                // Log the exception (logging mechanism not shown here)
+                throw new Exception("An error occurred while updating the student license application.", ex);
+            }
         }
 
         /// <summary>
@@ -99,15 +138,23 @@ namespace Project.Services
         /// <returns>A task that represents the asynchronous operation. The task result contains a boolean indicating whether the deletion was successful.</returns>
         public async Task<bool> DeleteStudentLicenseAsync(int id)
         {
-            var application = await _context.StudentLicenseApplications.FindAsync(id);
-            if (application == null)
+            try
             {
-                return false;
-            }
+                var application = await _context.StudentLicenseApplications.FindAsync(id);
+                if (application == null)
+                {
+                    return false;
+                }
 
-            _context.StudentLicenseApplications.Remove(application);
-            await _context.SaveChangesAsync();
-            return true;
+                _context.StudentLicenseApplications.Remove(application);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (logging mechanism not shown here)
+                throw new Exception("An error occurred while deleting the student license application.", ex);
+            }
         }
     }
 }

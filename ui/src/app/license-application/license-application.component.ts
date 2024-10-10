@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../Service/AllHttpRequests'; // Import the AuthService
+import { values } from 'constant';
 
 @Component({
   selector: 'app-student-license-form',
@@ -9,8 +10,8 @@ import { AuthService } from '../Service/AllHttpRequests'; // Import the AuthServ
 })
 export class StudentLicenseFormComponent {
   studentLicenseForm: FormGroup;
-  countries = ['Srilanka', 'Canada', 'United Kingdom', 'Australia', 'Germany', 'France', 'India', 'China', 'Japan', 'Brazil'];
-  institutes = ['University of Colombo', 'University of Peradeniya', 'University of Sri Jayewardenepura', 'University of Kelaniya', 'University of Moratuwa', 'University of Ruhuna', 'Eastern University, Sri Lanka', 'South Eastern University of Sri Lanka', 'Rajarata University of Sri Lanka', 'Sabaragamuwa University of Sri Lanka'];
+  countries = values.countries; // get contries List from constant.ts
+  institutes = values.institutes; // get institutes List from constant.ts
   fileTooLarge = false;
   invalidFileType = false;
   filename: string | null = "No File Selected";
@@ -21,7 +22,7 @@ export class StudentLicenseFormComponent {
     this.studentLicenseForm = this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      studentEmail: ['', [Validators.required, Validators.email]],
+      Email: ['', [Validators.required, Validators.email]],
       phone: ['', Validators.required],
       address: [''],
       country: ['', Validators.required],
@@ -72,17 +73,14 @@ export class StudentLicenseFormComponent {
   onSubmit() {
     if (this.studentLicenseForm.valid && this.studentIdCard) {
       const formData = new FormData();
+      const studentData = this.studentLicenseForm.value;
 
-      const studentData = {
-        name: `${this.studentLicenseForm.value.firstName} ${this.studentLicenseForm.value.lastName}`,
-        email: this.studentLicenseForm.value.studentEmail,
-        phone: this.studentLicenseForm.value.phone,
-        address: this.studentLicenseForm.value.address,
-        country: this.studentLicenseForm.value.country,
-        institute: this.studentLicenseForm.value.institute,
-        courseTitle: this.studentLicenseForm.value.courseTitle,
-        intake: this.studentLicenseForm.value.intake,
-      };
+      // Create name first before deleting
+      studentData.name = `${studentData.firstName} ${studentData.lastName}`.replace(/\s+/g, ' ').trim();
+
+      // Now delete the firstName and lastName fields
+      delete studentData.firstName;
+      delete studentData.lastName;
 
       formData.append('application', JSON.stringify(studentData));
       formData.append('file', this.studentIdCard, this.studentIdCard.name);

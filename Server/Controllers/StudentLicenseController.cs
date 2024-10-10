@@ -1,12 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json;
 using Project.Models;
 using Project.Services;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace Server.Controllers
 {
@@ -179,12 +177,12 @@ namespace Server.Controllers
                 if (result)
                 {
                     _logger.LogInformation("Application with ID {Id} updated successfully.", id);
-                    return Ok();
+                    return Ok(new { message = "Application updated successfully." });
                 }
                 else
                 {
                     _logger.LogWarning("Application with ID {Id} not found.", id);
-                    return NotFound();
+                    return NotFound(new { message = "Application not found." });
                 }
             }
             catch (Exception ex)
@@ -211,12 +209,12 @@ namespace Server.Controllers
                 if (result)
                 {
                     _logger.LogInformation("Application with ID {Id} deleted successfully.", id);
-                    return Ok();
+                    return Ok(new { message = "Application deleted successfully." });
                 }
                 else
                 {
                     _logger.LogWarning("Application with ID {Id} not found.", id);
-                    return NotFound();
+                    return NotFound(new { message = "Application not found." });
                 }
             }
             catch (Exception ex)

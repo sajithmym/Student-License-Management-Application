@@ -32,9 +32,9 @@
                 <label class="field_label" for="studentEmail">
                     <div class="star">*</div>Student Email
                 </label>
-                <input id="studentEmail" formControlName="studentEmail" type="email" required />
+                <input id="studentEmail" formControlName="Email" type="email" required />
                 <div class="warning"
-                    *ngIf="studentLicenseForm.get('studentEmail')?.touched && studentLicenseForm.get('studentEmail')?.invalid">
+                    *ngIf="studentLicenseForm.get('Email')?.touched && studentLicenseForm.get('Email')?.invalid">
                     Valid Email is required.
                 </div>
             </div>
