@@ -10,10 +10,14 @@ import { values } from 'constant';
 })
 export class AdminComponent implements OnInit {
   Applications: any[] = [];
+  filteredApplications: any[] = [];
   showPopup: boolean = false;
   loading: boolean = true;
   countries = values.countries;
   institutes = values.institutes;
+  searchTerm: string = '';
+  selectedCountry: string = '';
+  selectedInstitute: string = '';
 
   constructor(private authService: AuthService) { }
 
@@ -50,6 +54,7 @@ export class AdminComponent implements OnInit {
     this.authService.getApplications().subscribe(
       (data: any[]) => {
         this.Applications = data.map(application => ({ ...application, editing: false }));
+        this.applyFilters();
         this.loading = false;
       },
       (error: any) => {
@@ -57,6 +62,16 @@ export class AdminComponent implements OnInit {
         this.loading = false;
       }
     );
+  }
+
+  applyFilters() {
+    this.filteredApplications = this.Applications.filter(application => {
+      const matchesSearchTerm = application.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        application.email.toLowerCase().includes(this.searchTerm.toLowerCase());
+      const matchesCountry = this.selectedCountry ? application.country === this.selectedCountry : true;
+      const matchesInstitute = this.selectedInstitute ? application.institute === this.selectedInstitute : true;
+      return matchesSearchTerm && matchesCountry && matchesInstitute;
+    });
   }
 
   editCourse(application: any) {

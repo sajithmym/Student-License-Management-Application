@@ -7,10 +7,23 @@
         <span></span>
     </div>
     <div *ngIf="!loading">
+        <h1>Admin Panel</h1>
+
+        <!-- Search and Filter Section -->
+        <div class="filter-section">
+            <input type="text" placeholder="Search by name or email" [(ngModel)]="searchTerm"
+                (input)="applyFilters()" />
+            <select [(ngModel)]="selectedCountry" (change)="applyFilters()">
+                <option value="">All Countries</option>
+                <option *ngFor="let country of countries" [value]="country">{{ country }}</option>
+            </select>
+            <select [(ngModel)]="selectedInstitute" (change)="applyFilters()">
+                <option value="">All Institutes</option>
+                <option *ngFor="let institute of institutes" [value]="institute">{{ institute }}</option>
+            </select>
+        </div>
+
         <table class="styled-table">
-            <caption>
-                <h1>Admin Panel</h1>
-            </caption>
             <thead>
                 <tr>
                     <th>Name</th>
@@ -29,12 +42,12 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngIf="Applications.length === 0">
-                    <td colspan="12" style="color:red;font-size: x-large;text-align: center;">
-                        Unable to retrieve data. Please verify the connection.
+                <tr *ngIf="filteredApplications.length === 0">
+                    <td colspan="13" style="color:red;font-size: x-large;text-align: center;">
+                        No applications found.
                     </td>
                 </tr>
-                <tr *ngFor="let application of Applications">
+                <tr *ngFor="let application of filteredApplications">
                     <td *ngIf="!application.editing">{{ application.name || 'N/A' }}</td>
                     <td *ngIf="application.editing">
                         <input [(ngModel)]="application.name" />

@@ -10,6 +10,39 @@ h1 {
     font-weight: bold;
 }
 
+.filter-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.filter-section input[type="text"],
+.filter-section select {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 100%;
+    max-width: 300px;
+    box-sizing: border-box;
+}
+
+.filter-section input[type="text"]::placeholder {
+    color: #aaa;
+}
+
+.filter-section select {
+    appearance: none;
+    background: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="5"><path fill="%23333" d="M2 0L0 2h4z"/></svg>') no-repeat right 10px center;
+    background-size: 10px 10px;
+}
+
+.filter-section select::-ms-expand {
+    display: none;
+}
+
 .styled-table {
     width: 100%;
     border-collapse: collapse;
@@ -19,7 +52,7 @@ h1 {
 }
 
 .styled-table thead tr {
-    background-color: rgba(128, 128, 128, 0.681);
+    background-color: rgba(128, 128, 128, 0.76);
     color: #fff;
     text-align: left;
 }
@@ -87,6 +120,16 @@ h1 {
         padding: 10px;
     }
 
+    .filter-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-section input[type="text"],
+    .filter-section select {
+        max-width: 100%;
+    }
+
     .styled-table th,
     .styled-table td {
         padding: 10px;
@@ -133,9 +176,6 @@ h1 {
         font-size: 1rem;
     }
 }
-
-
-
 
 
 
