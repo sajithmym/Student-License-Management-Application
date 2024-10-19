@@ -2,7 +2,7 @@
 
 A web application for managing student licenses, featuring a frontend built with Angular and a backend powered by .NET Web API and MySQL.
 
-https://github.com/user-attachments/assets/77b0175b-cfd1-408b-a548-afe7256f7330
+[https://github.com/user-attachments/assets/77b0175b-cfd1-408b-a548-afe7256f7330](https://github.com/user-attachments/assets/27ca6a57-503e-4851-8079-d8f80636f104)
 
 ## Project Setup
 
@@ -84,7 +84,8 @@ The backend application will be available at `http://localhost:5190`.
 - Student license application submission
 - Admin panel for managing applications
 - File upload and download functionality
-
+![Screenshot 2024-10-19 125450](https://github.com/user-attachments/assets/6d623495-704f-4b46-8ce2-2b363798a45d)
+![Screenshot 2024-10-19 125518](https://github.com/user-attachments/assets/d367c9d2-941b-44ef-932a-751b196b9741)
 ![Screenshot 2024-10-07 225327](https://github.com/user-attachments/assets/aa69a832-7a75-4511-acea-f67fd91c101c)
 
 ![Screenshot 2024-10-07 225309](https://github.com/user-attachments/assets/ec1be54e-e1af-4f34-b765-8fa77f44c62d)
